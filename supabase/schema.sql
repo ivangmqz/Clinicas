@@ -1,5 +1,8 @@
 -- =========================================================
--- Esquema: Plataforma Web Clínica Dental / Estética
+-- Esquema: Plataforma Web Clínica Dental
+-- Este archivo se puede correr varias veces sin error (es
+-- "idempotente"): las tablas usan IF NOT EXISTS y las políticas
+-- se recrean con DROP POLICY IF EXISTS antes de cada CREATE POLICY.
 -- =========================================================
 
 create extension if not exists "uuid-ossp";
@@ -155,78 +158,108 @@ alter table public.products enable row level security;
 alter table public.appointment_requests enable row level security;
 
 -- profiles
+drop policy if exists "profiles: ver el propio" on public.profiles;
 create policy "profiles: ver el propio" on public.profiles
   for select using (id = auth.uid());
+drop policy if exists "profiles: admin ve todos" on public.profiles;
 create policy "profiles: admin ve todos" on public.profiles
   for select using (public.is_admin());
+drop policy if exists "profiles: admin actualiza" on public.profiles;
 create policy "profiles: admin actualiza" on public.profiles
   for update using (public.is_admin());
 
 -- site_settings: lectura pública, escritura solo admin
+drop policy if exists "site_settings: lectura publica" on public.site_settings;
 create policy "site_settings: lectura publica" on public.site_settings
   for select using (true);
+drop policy if exists "site_settings: admin actualiza" on public.site_settings;
 create policy "site_settings: admin actualiza" on public.site_settings
   for update using (public.is_admin());
+drop policy if exists "site_settings: admin inserta" on public.site_settings;
 create policy "site_settings: admin inserta" on public.site_settings
   for insert with check (public.is_admin());
 
 -- services: público ve activos, admin ve/gestiona todo
+drop policy if exists "services: publico ve activos" on public.services;
 create policy "services: publico ve activos" on public.services
   for select using (active = true or public.is_admin());
+drop policy if exists "services: admin inserta" on public.services;
 create policy "services: admin inserta" on public.services
   for insert with check (public.is_admin());
+drop policy if exists "services: admin actualiza" on public.services;
 create policy "services: admin actualiza" on public.services
   for update using (public.is_admin());
+drop policy if exists "services: admin borra" on public.services;
 create policy "services: admin borra" on public.services
   for delete using (public.is_admin());
 
 -- team_members
+drop policy if exists "team: publico ve activos" on public.team_members;
 create policy "team: publico ve activos" on public.team_members
   for select using (active = true or public.is_admin());
+drop policy if exists "team: admin inserta" on public.team_members;
 create policy "team: admin inserta" on public.team_members
   for insert with check (public.is_admin());
+drop policy if exists "team: admin actualiza" on public.team_members;
 create policy "team: admin actualiza" on public.team_members
   for update using (public.is_admin());
+drop policy if exists "team: admin borra" on public.team_members;
 create policy "team: admin borra" on public.team_members
   for delete using (public.is_admin());
 
 -- testimonials
+drop policy if exists "testimonials: publico ve activos" on public.testimonials;
 create policy "testimonials: publico ve activos" on public.testimonials
   for select using (active = true or public.is_admin());
+drop policy if exists "testimonials: admin inserta" on public.testimonials;
 create policy "testimonials: admin inserta" on public.testimonials
   for insert with check (public.is_admin());
+drop policy if exists "testimonials: admin actualiza" on public.testimonials;
 create policy "testimonials: admin actualiza" on public.testimonials
   for update using (public.is_admin());
+drop policy if exists "testimonials: admin borra" on public.testimonials;
 create policy "testimonials: admin borra" on public.testimonials
   for delete using (public.is_admin());
 
 -- gallery_images
+drop policy if exists "gallery: lectura publica" on public.gallery_images;
 create policy "gallery: lectura publica" on public.gallery_images
   for select using (true);
+drop policy if exists "gallery: admin inserta" on public.gallery_images;
 create policy "gallery: admin inserta" on public.gallery_images
   for insert with check (public.is_admin());
+drop policy if exists "gallery: admin actualiza" on public.gallery_images;
 create policy "gallery: admin actualiza" on public.gallery_images
   for update using (public.is_admin());
+drop policy if exists "gallery: admin borra" on public.gallery_images;
 create policy "gallery: admin borra" on public.gallery_images
   for delete using (public.is_admin());
 
 -- products: público ve activos (con stock o no), admin ve/gestiona todo (incl. stock)
+drop policy if exists "products: publico ve activos" on public.products;
 create policy "products: publico ve activos" on public.products
   for select using (active = true or public.is_admin());
+drop policy if exists "products: admin inserta" on public.products;
 create policy "products: admin inserta" on public.products
   for insert with check (public.is_admin());
+drop policy if exists "products: admin actualiza" on public.products;
 create policy "products: admin actualiza" on public.products
   for update using (public.is_admin());
+drop policy if exists "products: admin borra" on public.products;
 create policy "products: admin borra" on public.products
   for delete using (public.is_admin());
 
 -- appointment_requests: cualquiera inserta (form público), solo admin lee/gestiona
+drop policy if exists "leads: cualquiera inserta" on public.appointment_requests;
 create policy "leads: cualquiera inserta" on public.appointment_requests
   for insert with check (true);
+drop policy if exists "leads: admin lee" on public.appointment_requests;
 create policy "leads: admin lee" on public.appointment_requests
   for select using (public.is_admin());
+drop policy if exists "leads: admin actualiza" on public.appointment_requests;
 create policy "leads: admin actualiza" on public.appointment_requests
   for update using (public.is_admin());
+drop policy if exists "leads: admin borra" on public.appointment_requests;
 create policy "leads: admin borra" on public.appointment_requests
   for delete using (public.is_admin());
 
@@ -237,14 +270,17 @@ insert into storage.buckets (id, name, public)
 values ('clinic-images', 'clinic-images', true)
 on conflict (id) do nothing;
 
+drop policy if exists "clinic-images: lectura publica" on storage.objects;
 create policy "clinic-images: lectura publica"
   on storage.objects for select
   using (bucket_id = 'clinic-images');
 
+drop policy if exists "clinic-images: admin sube" on storage.objects;
 create policy "clinic-images: admin sube"
   on storage.objects for insert
   with check (bucket_id = 'clinic-images' and public.is_admin());
 
+drop policy if exists "clinic-images: admin borra" on storage.objects;
 create policy "clinic-images: admin borra"
   on storage.objects for delete
   using (bucket_id = 'clinic-images' and public.is_admin());
