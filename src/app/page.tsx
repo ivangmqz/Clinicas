@@ -6,6 +6,14 @@ import WhatsAppButton from "@/components/public/WhatsAppButton";
 import ContactForm from "@/components/public/ContactForm";
 import Footer from "@/components/public/Footer";
 import { ToothIcon, SparkleIcon, ShieldIcon, ClockIcon, HeartHandIcon } from "@/components/public/Icons";
+import {
+  DEMO_SETTINGS,
+  DEMO_SERVICES,
+  DEMO_PRODUCTS,
+  DEMO_TEAM,
+  DEMO_TESTIMONIALS,
+  DEMO_GALLERY
+} from "@/lib/demoContent";
 
 export const revalidate = 0;
 
@@ -13,12 +21,12 @@ export default async function Home() {
   const supabase = await createClient();
 
   const [
-    { data: settings },
-    { data: services },
-    { data: products },
-    { data: team },
-    { data: testimonials },
-    { data: gallery }
+    { data: settingsRow },
+    { data: servicesRows },
+    { data: productsRows },
+    { data: teamRows },
+    { data: testimonialsRows },
+    { data: galleryRows }
   ] = await Promise.all([
     supabase.from("site_settings").select("*").eq("id", 1).single(),
     supabase.from("services").select("*").eq("active", true).order("sort_order"),
@@ -28,26 +36,20 @@ export default async function Home() {
     supabase.from("gallery_images").select("*").order("sort_order")
   ]);
 
-  const s = settings ?? {
-    clinic_name: "Clínica Dental & Estética",
-    tagline: "Tu sonrisa y tu piel, en las mejores manos",
-    hero_subtitle: "",
-    hero_image_url: null,
-    about_title: "Sobre nosotros",
-    about_text: "",
-    phone: "",
-    whatsapp_number: "",
-    email: "",
-    address: "",
-    schedule_text: "",
-    instagram_url: null,
-    facebook_url: null,
-    map_embed_url: null,
-    primary_color: "#279e95"
-  };
+  // Mientras la base de datos no tenga contenido propio (antes de conectar
+  // Supabase, o justo después de correr schema.sql sin cargar datos), el
+  // sitio muestra contenido de ejemplo para que nunca se vea vacío. En
+  // cuanto haya datos reales, estos se usan automáticamente en su lugar.
+  const isDemo = !settingsRow && (!servicesRows || servicesRows.length === 0);
+  const s = settingsRow ?? DEMO_SETTINGS;
+  const services = servicesRows && servicesRows.length > 0 ? servicesRows : DEMO_SERVICES;
+  const products = productsRows && productsRows.length > 0 ? productsRows : DEMO_PRODUCTS;
+  const team = teamRows && teamRows.length > 0 ? teamRows : DEMO_TEAM;
+  const testimonials = testimonialsRows && testimonialsRows.length > 0 ? testimonialsRows : DEMO_TESTIMONIALS;
+  const gallery = galleryRows && galleryRows.length > 0 ? galleryRows : DEMO_GALLERY;
 
-  const dentalServices = (services ?? []).filter((sv) => sv.category === "dental");
-  const estServices = (services ?? []).filter((sv) => sv.category === "estetica");
+  const dentalServices = services.filter((sv) => sv.category === "dental");
+  const estServices = services.filter((sv) => sv.category === "estetica");
   const avgRating =
     testimonials && testimonials.length > 0
       ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(1)
@@ -62,6 +64,15 @@ export default async function Home() {
 
   return (
     <main className="bg-white">
+      {isDemo && (
+        <div className="bg-amber-400 px-5 py-2 text-center text-xs font-medium text-amber-950">
+          Estás viendo contenido de ejemplo. Conecta Supabase y entra a{" "}
+          <a href="/admin" className="underline underline-offset-2">
+            /admin
+          </a>{" "}
+          para cargar tu información real.
+        </div>
+      )}
       <Navbar clinicName={s.clinic_name} />
 
       {/* HERO */}
@@ -157,18 +168,18 @@ export default async function Home() {
             <ServiceGrid items={estServices} />
           </div>
         )}
-        {(services ?? []).length === 0 && (
+        {services.length === 0 && (
           <p className="mt-6 text-slate-500">Próximamente publicaremos nuestros tratamientos.</p>
         )}
       </section>
 
       {/* PRODUCTOS */}
-      {(products ?? []).length > 0 && (
+      {products.length > 0 && (
         <section id="productos" className="bg-slate-50 py-20">
           <div className="mx-auto max-w-6xl px-5">
             <SectionHeading eyebrow="Tienda" title="Productos recomendados" />
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {products!.map((p) => (
+              {products.map((p) => (
                 <div key={p.id} className="card flex flex-col">
                   <div className="relative mb-4 aspect-square w-full overflow-hidden rounded-xl bg-clinic-100">
                     {p.image_url ? (
@@ -206,11 +217,11 @@ export default async function Home() {
       )}
 
       {/* EQUIPO */}
-      {(team ?? []).length > 0 && (
+      {team.length > 0 && (
         <section id="equipo" className="mx-auto max-w-6xl px-5 py-20">
           <SectionHeading eyebrow="Equipo" title="Especialistas que te van a atender" />
           <div className="mt-12 grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-            {team!.map((member) => (
+            {team.map((member) => (
               <div key={member.id} className="text-center">
                 <div className="relative mx-auto aspect-square w-40 overflow-hidden rounded-full bg-clinic-100 shadow-lg ring-4 ring-white">
                   {member.photo_url && (
@@ -227,12 +238,12 @@ export default async function Home() {
       )}
 
       {/* GALERIA */}
-      {(gallery ?? []).length > 0 && (
+      {gallery.length > 0 && (
         <section id="galeria" className="bg-slate-50 py-20">
           <div className="mx-auto max-w-6xl px-5">
             <SectionHeading eyebrow="Galería" title="Nuestras instalaciones y resultados" />
             <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
-              {gallery!.map((img) => (
+              {gallery.map((img) => (
                 <div
                   key={img.id}
                   className="relative aspect-square overflow-hidden rounded-xl bg-clinic-100 shadow-sm transition hover:shadow-lg"
@@ -246,11 +257,11 @@ export default async function Home() {
       )}
 
       {/* TESTIMONIOS */}
-      {(testimonials ?? []).length > 0 && (
+      {testimonials.length > 0 && (
         <section id="testimonios" className="mx-auto max-w-6xl px-5 py-20">
           <SectionHeading eyebrow="Testimonios" title="Lo que dicen nuestros pacientes" />
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {testimonials!.map((t) => (
+            {testimonials.map((t) => (
               <div key={t.id} className="card">
                 <div className="text-blush-500">{"★".repeat(t.rating)}</div>
                 <p className="mt-3 text-sm text-slate-600">&ldquo;{t.content}&rdquo;</p>
@@ -278,7 +289,7 @@ export default async function Home() {
               </div>
             )}
           </div>
-          <ContactForm services={services ?? []} />
+          <ContactForm services={services} />
         </div>
       </section>
 
