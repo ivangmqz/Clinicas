@@ -4,12 +4,23 @@ import { useEffect, useState } from "react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import Modal from "@/components/admin/Modal";
 import { formatPrice } from "@/lib/utils";
-import type { Database, ServiceCategory } from "@/types/database.types";
+import type { Database } from "@/types/database.types";
 
 type Service = Database["public"]["Tables"]["services"]["Row"];
 
+const SUGGESTED_CATEGORIES = [
+  "Odontología general",
+  "Estética dental",
+  "Ortodoncia",
+  "Rehabilitación oral",
+  "Endodoncia",
+  "Periodoncia",
+  "Implantología",
+  "Odontopediatría"
+];
+
 const EMPTY: Omit<Service, "id" | "created_at"> = {
-  category: "dental",
+  category: "Odontología general",
   name: "",
   description: "",
   price: null,
@@ -68,7 +79,7 @@ export default function ServicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-clinic-900">Servicios</h1>
-          <p className="mt-1 text-sm text-slate-500">Tratamientos dentales y estéticos que verán tus pacientes.</p>
+          <p className="mt-1 text-sm text-slate-500">Tratamientos y especialidades dentales que verán tus pacientes.</p>
         </div>
         <button onClick={() => setEditing({ ...EMPTY })} className="btn-primary">
           + Nuevo servicio
@@ -84,7 +95,7 @@ export default function ServicesPage() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="rounded-full bg-clinic-50 px-2 py-0.5 text-xs font-medium text-clinic-700">
-                    {s.category === "dental" ? "Odontología" : "Estética"}
+                    {s.category || "Sin categoría"}
                   </span>
                   {!s.active && (
                     <span className="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">Inactivo</span>
@@ -116,15 +127,20 @@ export default function ServicesPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="label">Categoría</label>
-                <select
+                <label className="label">Especialidad / categoría</label>
+                <input
+                  required
+                  list="service-categories"
                   className="input"
+                  placeholder="Ej. Ortodoncia"
                   value={editing.category}
-                  onChange={(e) => setEditing({ ...editing, category: e.target.value as ServiceCategory })}
-                >
-                  <option value="dental">Odontología</option>
-                  <option value="estetica">Estética</option>
-                </select>
+                  onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+                />
+                <datalist id="service-categories">
+                  {SUGGESTED_CATEGORIES.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className="label">Nombre</label>

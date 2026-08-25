@@ -54,11 +54,13 @@ create table if not exists public.site_settings (
 insert into public.site_settings (id) values (1) on conflict (id) do nothing;
 
 -- ---------------------------------------------------------
--- services: tratamientos dentales / estéticos.
+-- services: tratamientos dentales, agrupados por especialidad
+-- (Odontología general, Estética dental, Ortodoncia, Rehabilitación
+-- oral, Endodoncia, etc. — texto libre, tú defines las categorías).
 -- ---------------------------------------------------------
 create table if not exists public.services (
   id uuid primary key default uuid_generate_v4(),
-  category text not null check (category in ('dental', 'estetica')),
+  category text not null default '',
   name text not null,
   description text not null default '',
   price numeric(10, 2),

@@ -1,4 +1,3 @@
-export type ServiceCategory = "dental" | "estetica";
 export type LeadStatus = "nuevo" | "contactado" | "agendado" | "cancelado";
 
 // NOTA: se usan `type` (no `interface`) porque TypeScript solo reconoce los
@@ -36,7 +35,7 @@ export type SiteSettings = {
 
 export type Service = {
   id: string;
-  category: ServiceCategory;
+  category: string;
   name: string;
   description: string;
   price: number | null;
@@ -123,7 +122,7 @@ export type Database = {
       };
       services: {
         Row: Service;
-        Insert: Partial<Service> & { category: ServiceCategory; name: string };
+        Insert: Partial<Service> & { category: string; name: string };
         Update: Partial<Service>;
         Relationships: [];
       };
@@ -174,7 +173,6 @@ export type Database = {
       };
     };
     Enums: {
-      service_category: ServiceCategory;
       lead_status: LeadStatus;
     };
     CompositeTypes: Record<string, never>;

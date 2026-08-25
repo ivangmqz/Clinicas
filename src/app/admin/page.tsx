@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
           { href: "/admin/settings", label: "Editar información del sitio", desc: "Nombre, contacto, horarios, hero." },
-          { href: "/admin/services", label: "Gestionar servicios", desc: "Tratamientos dentales y estéticos." },
+          { href: "/admin/services", label: "Gestionar servicios", desc: "Tratamientos y especialidades dentales." },
           { href: "/admin/products", label: "Gestionar productos y stock", desc: "Catálogo, precios e inventario." },
           { href: "/admin/team", label: "Gestionar equipo", desc: "Doctores y especialistas." },
           { href: "/admin/testimonials", label: "Gestionar testimonios", desc: "Reseñas de pacientes." },

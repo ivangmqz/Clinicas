@@ -48,8 +48,7 @@ export default async function Home() {
   const testimonials = testimonialsRows && testimonialsRows.length > 0 ? testimonialsRows : DEMO_TESTIMONIALS;
   const gallery = galleryRows && galleryRows.length > 0 ? galleryRows : DEMO_GALLERY;
 
-  const dentalServices = services.filter((sv) => sv.category === "dental");
-  const estServices = services.filter((sv) => sv.category === "estetica");
+  const serviceCategories = Array.from(new Set(services.map((sv) => sv.category || "Otros tratamientos")));
   const avgRating =
     testimonials && testimonials.length > 0
       ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(1)
@@ -148,26 +147,17 @@ export default async function Home() {
 
       {/* SERVICIOS */}
       <section id="servicios" className="mx-auto max-w-6xl px-5 py-20">
-        <SectionHeading eyebrow="Servicios" title="Tratamientos dentales y estéticos" />
+        <SectionHeading eyebrow="Servicios" title="Especialidades y tratamientos dentales" />
 
-        {dentalServices.length > 0 && (
-          <div className="mt-12">
+        {serviceCategories.map((category, i) => (
+          <div key={category} className={i === 0 ? "mt-12" : "mt-14"}>
             <div className="mb-5 flex items-center gap-2">
               <ToothIcon className="h-6 w-6 text-clinic-600" />
-              <h3 className="font-display text-2xl font-semibold text-clinic-800">Odontología</h3>
+              <h3 className="font-display text-2xl font-semibold text-clinic-800">{category}</h3>
             </div>
-            <ServiceGrid items={dentalServices} />
+            <ServiceGrid items={services.filter((sv) => (sv.category || "Otros tratamientos") === category)} />
           </div>
-        )}
-        {estServices.length > 0 && (
-          <div className="mt-14">
-            <div className="mb-5 flex items-center gap-2">
-              <SparkleIcon className="h-6 w-6 text-blush-500" />
-              <h3 className="font-display text-2xl font-semibold text-clinic-800">Estética</h3>
-            </div>
-            <ServiceGrid items={estServices} />
-          </div>
-        )}
+        ))}
         {services.length === 0 && (
           <p className="mt-6 text-slate-500">Próximamente publicaremos nuestros tratamientos.</p>
         )}

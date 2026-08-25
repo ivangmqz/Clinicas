@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  title: "Clínica Dental & Estética",
-  description: "Sitio web y agenda de citas para clínica dental y estética."
+  title: "Clínica Dental",
+  description: "Sitio web y agenda de citas para clínica dental."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

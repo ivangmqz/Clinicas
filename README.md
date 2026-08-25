@@ -1,9 +1,10 @@
-# Clínica Web — Landing + Panel de Administración
+# Clínica Dental Web — Landing + Panel de Administración
 
 Plataforma full-stack (landing pública + panel Administrador) para una clínica
-dental y/o estética. Construida con **Next.js 16 (App Router) + TypeScript +
-Tailwind CSS** en el frontend y **Supabase** (Postgres + Auth + Storage) en el
-backend.
+dental, organizada por especialidad (Odontología general, Estética dental,
+Ortodoncia, Rehabilitación oral, etc. — tú defines las categorías).
+Construida con **Next.js 16 (App Router) + TypeScript + Tailwind CSS** en el
+frontend y **Supabase** (Postgres + Auth + Storage) en el backend.
 
 ---
 
@@ -12,7 +13,7 @@ backend.
 **Sitio público (`/`):**
 - Hero con imagen, badges de confianza y CTA de WhatsApp / agendar cita.
 - Franja "Por qué elegirnos" con iconos.
-- Servicios agrupados por categoría (Odontología / Estética) con precio.
+- Servicios agrupados por especialidad dental (categorías libres: Odontología general, Estética dental, Ortodoncia, Rehabilitación oral, etc.) con precio.
 - Productos destacados (línea de retail, solo los que tienen stock activo).
 - Sección "Sobre nosotros".
 - Equipo de especialistas.
